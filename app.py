@@ -8,17 +8,20 @@ from keras.models import load_model
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 import base64
+from flask_cors import CORS 
 
 app = Flask(__name__)
+CORS(app, origins='*')
+
 
 model = load_model('BrainTumor10EpochsCategorical.h5')
 print('Model loaded. Check http://127.0.0.1:5000/')
 
 def get_className(classNo):
     if classNo == 0:
-        return "No Brain Tumor"
+        return False
     elif classNo == 1:
-        return "Yes Brain Tumor"
+        return True
 
 def getResult(img_bytes):
     # Convert bytes to numpy array
@@ -40,7 +43,9 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    print("working")
     data = request.get_json()
+    print(data['image'])
     if 'image' not in data:
         return jsonify({'error': 'No image provided'})
     
